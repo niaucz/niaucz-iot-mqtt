@@ -72,6 +72,7 @@ public class MqttSubscriberConfig {
         // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送心跳判断客户端是否在线
         // 但这个方法并没有重连的机制
         options.setKeepAliveInterval(20);
+        options.setAutomaticReconnect(true);
         return options;
     }
 
@@ -117,32 +118,32 @@ public class MqttSubscriberConfig {
     @Bean
     @ServiceActivator(inputChannel = CHANNEL_NAME_IN)
     public MessageHandler handler() {
-        return new MessageHandler() {
-            @Override
-            public void handleMessage(Message<?> message) throws MessagingException {
-                String topic = message.getHeaders().get("mqtt_receivedTopic").toString();
-                String msg = message.getPayload().toString();
-                System.out.println("\n--------------------START-------------------\n" +
-                        "接收到订阅消息:\ntopic:" + topic + "\nmessage:" + msg +
-                        "\n---------------------END--------------------");
-                ModBusData modBusData = JSONUtil.toBean(msg, ModBusData.class);
-                System.out.println("modBusData ----> " + modBusData);
-                Integer[] data = modBusData.getData();
-                System.out.println("----------------理论数据-----------------");
-                System.out.println("co2 ---> " + MathFormula.co2(data[0], data[1]) + " ppm");
-                System.out.println("pm25 ---> " + MathFormula.pm25(data[6], data[7]) + " ug/m³");
-                System.out.println("humidity ---> " + MathFormula.humidity(data[10], data[11]) + " %RH");
-                System.out.println("temperature ---> " + MathFormula.temperature(data[8], data[9]) + " ℃");
-                Environment environment = new Environment();
-                environment.setClientId(modBusData.getClientId());
-                environment.setSlaveId(modBusData.getSlaveID());
-                environment.setCo2(MathFormula.co2(data[0], data[1]));
-                environment.setPm25(MathFormula.pm25(data[6], data[7]));
-                environment.setHumidity(MathFormula.humidity(data[10], data[11]));
-                environment.setTemperature(MathFormula.temperature(data[8], data[9]));
-                environment.setDataTime(new Date());
-                environment.setCreateTime(new Date());
-                environmentMapper.insert(environment);
+        return message -> {
+            String topic = message.getHeaders().get("mqtt_receivedTopic").toString();
+            String msg = message.getPayload().toString();
+            System.out.println("\n--------------------START-------------------\n" +
+                    "接收到订阅消息:\ntopic:" + topic + "\nmessage:" + msg +
+                    "\n---------------------END--------------------");
+            ModBusData modBusData = JSONUtil.toBean(msg, ModBusData.class);
+            System.out.println("modBusData ----> " + modBusData);
+            Integer[] data = modBusData.getData();
+            System.out.println("----------------理论数据-----------------");
+            //什么？你问我这里为什么写测试数据？ 因为我没有这个环境传感器的说明书。。。。我也不知道哪个地址是什么
+            //下面是我猜的经过计算凭感觉应该是这个温度
+            System.out.println("co2 ---> " + MathFormula.co2(data[0], data[1]) + " ppm");
+            System.out.println("pm25 ---> " + MathFormula.pm25(data[6], data[7]) + " ug/m³");
+            System.out.println("humidity ---> " + MathFormula.humidity(data[10], data[11]) + " %RH");
+            System.out.println("temperature ---> " + MathFormula.temperature(data[8], data[9]) + " ℃");
+            Environment environment = new Environment();
+            environment.setClientId(modBusData.getClientId());
+            environment.setSlaveId(modBusData.getSlaveID());
+            environment.setCo2(MathFormula.co2(data[0], data[1]));
+            environment.setPm25(MathFormula.pm25(data[6], data[7]));
+            environment.setHumidity(MathFormula.humidity(data[10], data[11]));
+            environment.setTemperature(MathFormula.temperature(data[8], data[9]));
+            environment.setDataTime(new Date());
+            environment.setCreateTime(new Date());
+            environmentMapper.insert(environment);
 //                System.out.println("-----------------测试数据----------------");
 //                for (int i = 0; i < data.length; i += 2) {
 //                    System.out.println(i+"-"+(i+1) +"-"+ "co2 ---> " + MathFormula.co2(data[i], data[i + 1]));
@@ -151,7 +152,6 @@ public class MqttSubscriberConfig {
 //                    System.out.println(i+"-"+(i+1) +"-"+ "temperature ---> " + MathFormula.temperature(data[i], data[i + 1]));
 //                    System.out.println();
 //                }
-            }
         };
     }
 }
