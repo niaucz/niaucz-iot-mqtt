@@ -1,7 +1,10 @@
-package com.example.mqtt;
+package com.example.mqtt.utils;
 
 import java.math.BigDecimal;
 
+/**
+ * 计算公式
+ */
 public class MathFormula {
 
     private static final BigDecimal COM1 = BigDecimal.valueOf(256);

@@ -1,4 +1,4 @@
-package com.example.mqtt;
+package com.example.mqtt.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.mqtt.entity.Environment;

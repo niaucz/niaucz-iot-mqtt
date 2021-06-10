@@ -1,15 +1,18 @@
 mqtt:
-  serverURIs: tcp://mqtt-server:1883
+  host: tcp://192.168.1.254:1883
   username: admin
-  password: 123456789
-  client:
-    id: spring-${random.value}
-  topic: topic/test
+  password: admin
+  #  client:
+  #    id: spring-${random.value}
+  topic: topic/environment
+  auto-reconnect: true
+  timeout: 10
+  keepalive: 20
 server:
   port: 8889
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql-server:3306/mqtt?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://121.196.150.48:3306/mqtt?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
     username: root
     password: 123456
