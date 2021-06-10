@@ -34,7 +34,7 @@ public class IotMqttSubConfig {
     @Bean
     public MessageProducer mqttInbound() {
         //TODO clientID生成
-        MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter("Sub-" + UUID.randomUUID(), mqttClientFactory, iotMqttConfig.defaultTopic);
+        MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter("Sub-" + UUID.randomUUID(), mqttClientFactory, "data/environment");
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -52,7 +52,7 @@ public class IotMqttSubConfig {
         return message -> {
             try {
                 String string = message.getPayload().toString();
-                System.out.println("接收到消息：" + string);
+                System.out.println("接收到de数据：" + string);
             } catch (MessagingException ex) {
             }
         };

@@ -26,12 +26,12 @@ public class IotMqttPubConfig {
     }
 
     @Bean
-    @ServiceActivator(inputChannel = "iotMqttInputChannel")
+    @ServiceActivator(inputChannel = "mqttOutboundChannel")
     public MessageHandler mqttOutbound() {
         //TODO clientID生成
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler("Pub-" + UUID.randomUUID(), mqttClientFactory);
         messageHandler.setAsync(false);
-        messageHandler.setDefaultTopic(iotMqttConfig.defaultTopic);
+        messageHandler.setDefaultTopic("mqtt/command");
         return messageHandler;
     }
 }
